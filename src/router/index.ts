@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
@@ -6,6 +7,7 @@ import {
   createWebHistory,
 } from 'vue-router';
 
+import { useAuthStore } from 'src/stores/auth.store';
 import routes from './routes';
 
 /*
@@ -30,6 +32,19 @@ export default route((/* { store, ssrContext } */) => {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach((to, from) => {
+    const authStore = useAuthStore();
+    if (to.meta.requiresAuth && !authStore.user) {
+      // this route requires auth, check if logged in
+      // if not, redirect to login page.
+      return {
+        path: '/',
+        // save the location we were at to come back later
+        // query: { redirect: to.fullPath },
+      };
+    }
   });
 
   return Router;

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <q-btn color="white" :to="{ name: 'create-item' }" text-color="black" label="Standard" />
     <p>{{ title }}</p>
     <ul>
       <li v-for="todo in todos" :key="todo.id" @click="increment">
@@ -10,6 +11,35 @@
     <p>Active: {{ active ? 'yes' : 'no' }}</p>
     <p>Clicks on todos: {{ clickCount }}</p>
   </div>
+  <template>
+    <div class="q-pa-md" style="max-width: 300px">
+      <q-input filled v-model="date">
+        <template v-slot:prepend>
+          <q-icon name="event" class="cursor-pointer">
+            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+              <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+
+        <template v-slot:append>
+          <q-icon name="access_time" class="cursor-pointer">
+            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+              <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+      </q-input>
+    </div>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -25,6 +55,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   todos: () => [],
 });
+
+const date = ref(new Date().toISOString());
 
 const clickCount = ref(0);
 function increment() {

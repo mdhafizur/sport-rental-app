@@ -12,8 +12,10 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
+    "firebase": "^9.9.2",
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",
+    "ts-localstorage": "^2.0.0",
     "vue": "^3.0.0",
     "vue-i18n": "^9.0.0",
     "vue-router": "^4.0.0"
@@ -25,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "autoprefixer": "^10.4.2",
+    "dotenv": "^16.0.1",
     "electron": "^20.0.1",
     "eslint": "^8.10.0",
     "eslint-config-airbnb-base": "^15.0.0",
