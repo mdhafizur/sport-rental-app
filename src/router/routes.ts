@@ -37,6 +37,18 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/bookings',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: 'create', name: 'create-booking', component: () => import('pages/bookings/CreateBookingPage.vue'), meta: { requiresAuth: true },
+      },
+      {
+        path: 'list', name: 'list-booking', component: () => import('pages/bookings/ListBooking.vue'), meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
     path: '/test',
     name: 'test',
     component: () => import('layouts/MainLayout.vue'),

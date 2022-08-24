@@ -8,11 +8,6 @@
     <div class="col-10 col-sm-6 col-md-6 col-lg-4">
 
       <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-        <!-- <div>
-        <div v-for="image in item.images" :key="image._key">
-
-        </div>
-      </div> -->
         <div>
           <q-uploader class="w-100" style="width:100%" url="http://localhost:4444/upload" label="Upload Images" multiple
             batch accept=".jpg, image/*" max-files="3" max-file-size="200480" :auto-upload="false"
@@ -34,15 +29,15 @@
           <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
         </div>
       </q-form>
-
+      {{ item }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import { reactive, ref as REF } from 'vue';
-import { collection, addDoc } from 'firebase/firestore';
+import { reactive, ref as REF, toRaw } from 'vue';
+import { collection, addDoc, updateDoc } from 'firebase/firestore';
 import { firestore, storage } from 'src/firebase';
 import {
   ref, uploadBytesResumable, getDownloadURL,
@@ -58,9 +53,17 @@ const item = reactive({
   title: '',
   price: '' || null,
   images: [],
+  urls: [],
 });
 
 const accept = REF(false);
+const imageUrls: any[] = [];
+const onReset = () => {
+  item.title = '';
+  item.price = null;
+  item.images = [];
+  accept.value = false;
+};
 
 // Create the file metadata
 /** @type {any} */
@@ -68,34 +71,61 @@ const metadata = {
   contentType: 'image/jpeg',
 };
 
-const handleFileUploadOnFirebaseStorage = async (bucketName: string, file: any) => {
-  const storageRef = ref(storage, `/${bucketName}/${file[0].name}`);
-  const uploadTask = uploadBytesResumable(storageRef, file[0], metadata);
-  return getDownloadURL(uploadTask.snapshot.ref);
-};
+const handleSubmission = () => {
+  const promises: any[] = [];
+  // eslint-disable-next-line array-callback-return
+  item.images.map((image) => {
+    const storageRef = ref(storage, `/images/${image.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, image, metadata);
+    promises.push(uploadTask);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        console.log(snapshot);
+        // const progress = Math.round(
+        //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        // );
+        // setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      async () => {
+        await getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          item.urls.push(downloadURL);
+          console.log('File available at', downloadURL);
+        });
+      },
+    );
+  });
 
-const handleFilesUploadOnFirebaseStorage = async (bucketName: string, files: any) => {
-  //  If no file, return
-  if (files.length === 0) return [];
+  Promise.all(promises)
+    .then(() => {
+      const data = {
+        title: item.title,
+        price: Number(item.price),
+        images: item.urls,
+      };
 
-  // Create an array to store all download URLs
-  const fileUrls = [];
+      addDoc(collection(firestore, 'items'), {
+        title: item.title,
+        price: Number(item.price),
+      }).then((docRef) => {
+        updateDoc(docRef, {
+          images: toRaw(item.urls),
+        });
+        itemsStore.setItems([...itemsStore.items, ...[{ ...data, id: docRef.id }]]);
 
-  // Loop over all the files
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < files.length; i++) {
-    // Get a file to upload
-    const file = files[i];
-
-    // handleFileUploadOnFirebaseStorage function is in above section
-    // eslint-disable-next-line no-await-in-loop
-    const downloadFileResponse = await handleFileUploadOnFirebaseStorage(bucketName, file);
-
-    // Push the download url to URLs array
-    fileUrls.push(downloadFileResponse);
-  }
-
-  return fileUrls;
+        $q.notify({
+          color: 'green-4',
+          textColor: 'white',
+          icon: 'cloud_done',
+          message: 'Submitted',
+        });
+        onReset();
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 const onSubmit = async () => {
@@ -107,71 +137,13 @@ const onSubmit = async () => {
       message: 'You need to accept the license and terms first',
     });
   } else {
-    const fileUrls = await handleFilesUploadOnFirebaseStorage('images', item.images);
-    // item.images.forEach((file) => {
-    //   const datetime = new Date().toISOString().split('.')[0];
-    //   const storageRef = ref(storage, `images/${file[0].name}`);
-
-    //   const uploadTask = uploadBytesResumable(storageRef, file[0], metadata);
-
-    //   // Listen for state changes, errors, and completion of the upload.
-    //   uploadTask.on(
-    //     'state_changed',
-    //     (snapshot) => {
-    //       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //       console.log(`Upload is ${progress}% done`);
-    //     },
-    //     (error) => {
-    //       // A full list of error codes is available at
-    //       // https://firebase.google.com/docs/storage/web/handle-errors
-
-    //       console.log(error);
-    //     },
-    //     () => {
-    //       // Upload completed successfully, now we can get the download URL
-    //       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-    //         console.log('File available at', downloadURL);
-    //         uploadedImagesURL.push(downloadURL);
-    //       });
-    //     },
-    //   );
-    // });
-
-    const data = {
-      title: item.title,
-      price: Number(item.price),
-      images: fileUrls,
-    };
-
-    try {
-      const docRef = await addDoc(collection(firestore, 'items'), {
-        ...data,
-      });
-      itemsStore.setItems([...itemsStore.items, ...[{ ...data, id: docRef.id }]]);
-      console.log('Document written with ID: ', docRef.id);
-
-      $q.notify({
-        color: 'green-4',
-        textColor: 'white',
-        icon: 'cloud_done',
-        message: 'Submitted',
-      });
-    } catch (error) {
-      console.log('Error adding document: ', error);
-    }
+    handleSubmission();
   }
 };
 
-const onReset = () => {
-  item.title = '';
-  item.price = null;
-  accept.value = false;
-};
-
-function factoryFn(file: any) {
-  // returning a Promise
-  console.log('file: ', file);
-  item.images.push(file);
+function factoryFn(files: any) {
+  console.log('files: ', files);
+  files.forEach((file: any) => item.images.push(file));
   console.log('images', item.images);
 }
 

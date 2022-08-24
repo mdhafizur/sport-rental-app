@@ -18,32 +18,36 @@
       <p class="text-center">Sign in with credentials</p>
     </template>
 
-    <q-form @submit="submitForm">
-      <q-input v-model="formData.email" outlined class="q-mb-md" type="email" label="Email" />
-      <q-input v-model="formData.password" outlined class="q-mb-md" type="password" label="Password" />
-      <div class="row">
-        <q-space />
-        <q-btn type="submit" color="primary" :label="tab === 'signin' ? 'Login' : 'Register'" />
+    <div v-show="showSimulatedReturnData">
+      <q-form @submit="submitForm">
+        <q-input v-model="formData.email" outlined class="q-mb-md" type="email" label="Email" />
+        <q-input v-model="formData.password" outlined class="q-mb-md" type="password" label="Password" />
+        <div class="row">
+          <q-space />
+          <q-btn type="submit" color="primary" :label="tab === 'signin' ? 'Login' : 'Register'" />
+        </div>
+      </q-form>
+      <div class="text-center q-my-md">
+        <q-btn v-if="tab !== 'signup'" flat @click="forgotPassword" label="Forgot Password?" color="green"
+          class="text-capitalize rounded-borders" />
       </div>
-    </q-form>
-
-    <div class="text-center q-my-md">
-      <q-btn v-if="tab !== 'signup'" flat @click="forgotPassword" label="Forgot Password?" color="green"
-        class="text-capitalize rounded-borders" />
+      <q-dialog v-model="resetPwdDialog">
+        <ForgotPassword />
+      </q-dialog>
     </div>
+    <q-inner-loading :showing="visible" label="Please wait..." label-class="text-teal" label-style="font-size: 1.1em" />
 
-    <q-dialog v-model="resetPwdDialog">
-      <ForgotPassword />
-    </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 
-import { reactive, ref } from 'vue';
+import {
+  onMounted, reactive, ref,
+} from 'vue';
 import {
   createUserWithEmailAndPassword, getRedirectResult, GoogleAuthProvider,
-  signInWithEmailAndPassword, signInWithPopup, signInWithRedirect,
+  signInWithEmailAndPassword, signInWithRedirect,
 } from '@firebase/auth';
 import { auth } from 'src/firebase';
 import ForgotPassword from 'components/ForgotPassword.vue';
@@ -56,6 +60,10 @@ const authStore = useAuthStore();
 
 const $router = useRouter();
 const $q = useQuasar();
+
+const visible = ref(true);
+const showSimulatedReturnData = ref(false);
+
 const formData = reactive({
   email: '',
   password: '',
@@ -109,14 +117,31 @@ const google = async () => {
   provider.addScope('profile');
   provider.addScope('email');
 
-  signInWithPopup(auth, provider)
-    .then((result: any) => {
-      console.log('result', result);
-      authStore.login(result.user);
-      $q.notify({ message: 'Sign In Success.', color: 'green', position: 'top-right' });
-    })
-    .catch((error: any) => console.log('error', error));
+  // signInWithPopup(auth, provider)
+  //   .then((result: any) => {
+  //     console.log('result', result);
+  //     authStore.login(result.user);
+  //     $q.notify({ message: 'Sign In Success.', color: 'green', position: 'top-right' });
+  //   })
+  //   .catch((error: any) => console.log('error', error));
+  await signInWithRedirect(auth, provider);
 };
+
+onMounted(async () => {
+  const result = await getRedirectResult(auth);
+  console.log('result', result);
+  if (result) {
+    authStore.login(result.user);
+  }
+  if (authStore.user) {
+    visible.value = false;
+    showSimulatedReturnData.value = true;
+    $q.notify({ message: 'Sign In Success.', color: 'green', position: 'top-right' });
+  } else {
+    visible.value = false;
+    showSimulatedReturnData.value = true;
+  }
+});
 
 const forgotPassword = () => {
   resetPwdDialog.value = true;
