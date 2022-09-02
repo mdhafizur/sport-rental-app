@@ -9,6 +9,5 @@ export const useInventoriesStore = defineStore({
     async setItems(items: any) {
       this.inventories = items;
     },
-
   },
 });

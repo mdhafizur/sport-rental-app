@@ -6,9 +6,16 @@ const routes: RouteRecordRaw[] = [
 
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '/', name: 'auth', component: () => import('pages/AuthPage.vue') },
       {
-        path: '/home', name: 'home', component: () => import('pages/IndexPage.vue'), meta: { requiresAuth: true },
+        path: '/',
+        name: 'auth',
+        component: () => import('pages/AuthPage.vue'),
+      },
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('pages/IndexPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -17,10 +24,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: 'create', name: 'create-item', component: () => import('pages/items/CreateItemPage.vue'), meta: { requiresAuth: true },
+        path: 'create',
+        name: 'create-item',
+        component: () => import('pages/items/CreateItemPage.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: 'list', name: 'list-item', component: () => import('pages/items/ListItemPage.vue'), meta: { requiresAuth: true },
+        path: 'list',
+        name: 'list-item',
+        component: () => import('pages/items/ListItemPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -29,10 +42,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: 'create', name: 'create-inventory', component: () => import('pages/inventories/CreateInventoryPage.vue'), meta: { requiresAuth: true },
+        path: 'create',
+        name: 'create-inventory',
+        component: () => import('pages/inventories/CreateInventoryPage.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: 'list', name: 'list-inventory', component: () => import('pages/inventories/ListInventoryPage.vue'), meta: { requiresAuth: true },
+        path: 'list',
+        name: 'list-inventory',
+        component: () => import('pages/inventories/ListInventoryPage.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -41,10 +60,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: 'create', name: 'create-booking', component: () => import('pages/bookings/CreateBookingPage.vue'), meta: { requiresAuth: true },
+        path: 'create',
+        name: 'create-booking',
+        component: () => import('pages/bookings/CreateBookingPage.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: 'list', name: 'list-booking', component: () => import('pages/bookings/ListBooking.vue'), meta: { requiresAuth: true },
+        path: 'list',
+        name: 'list-booking',
+        component: () => import('pages/bookings/ListBooking.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },

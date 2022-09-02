@@ -8,8 +8,13 @@
       <div class="text-center q-mb-lg">Sign in with</div>
     </template>
     <div class="flex flex-center">
-      <q-btn class="flex flex-center q-px-lg q-py-sm q-mb-md" size="md" label="Google" @click="google"
-        color="primary" />
+      <q-btn
+        class="flex flex-center q-px-lg q-py-sm q-mb-md"
+        size="md"
+        label="Google"
+        color="primary"
+        @click="google"
+      />
     </div>
     <template v-if="props.tab === 'signup'">
       <p class="text-center">Sign up with credentials</p>
@@ -20,34 +25,60 @@
 
     <div v-show="showSimulatedReturnData">
       <q-form @submit="submitForm">
-        <q-input v-model="formData.email" outlined class="q-mb-md" type="email" label="Email" />
-        <q-input v-model="formData.password" outlined class="q-mb-md" type="password" label="Password" />
+        <q-input
+          v-model="formData.email"
+          outlined
+          class="q-mb-md"
+          type="email"
+          label="Email"
+        />
+        <q-input
+          v-model="formData.password"
+          outlined
+          class="q-mb-md"
+          type="password"
+          label="Password"
+        />
         <div class="row">
           <q-space />
-          <q-btn type="submit" color="primary" :label="tab === 'signin' ? 'Login' : 'Register'" />
+          <q-btn
+            type="submit"
+            color="primary"
+            :label="tab === 'signin' ? 'Login' : 'Register'"
+          />
         </div>
       </q-form>
       <div class="text-center q-my-md">
-        <q-btn v-if="tab !== 'signup'" flat @click="forgotPassword" label="Forgot Password?" color="green"
-          class="text-capitalize rounded-borders" />
+        <q-btn
+          v-if="tab !== 'signup'"
+          flat
+          label="Forgot Password?"
+          color="green"
+          class="text-capitalize rounded-borders"
+          @click="forgotPassword"
+        />
       </div>
       <q-dialog v-model="resetPwdDialog">
         <ForgotPassword />
       </q-dialog>
     </div>
-    <q-inner-loading :showing="visible" label="Please wait..." label-class="text-teal" label-style="font-size: 1.1em" />
-
+    <q-inner-loading
+      :showing="visible"
+      label="Please wait..."
+      label-class="text-teal"
+      label-style="font-size: 1.1em"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-
+import { onMounted, reactive, ref } from 'vue';
 import {
-  onMounted, reactive, ref,
-} from 'vue';
-import {
-  createUserWithEmailAndPassword, getRedirectResult, GoogleAuthProvider,
-  signInWithEmailAndPassword, signInWithRedirect,
+  createUserWithEmailAndPassword,
+  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithRedirect,
 } from '@firebase/auth';
 import { auth } from 'src/firebase';
 import ForgotPassword from 'components/ForgotPassword.vue';
@@ -95,7 +126,11 @@ const createUser = (email: any, password: any) => {
     .then((result: any) => {
       console.log(result);
       authStore.login(result.user);
-      $q.notify({ message: 'Sign Up Successful.', icon: 'success', color: 'green' });
+      $q.notify({
+        message: 'Sign Up Successful.',
+        icon: 'success',
+        color: 'green',
+      });
       $router.push('/home');
     })
     .catch((error: any) => {
@@ -136,7 +171,11 @@ onMounted(async () => {
   if (authStore.user) {
     visible.value = false;
     showSimulatedReturnData.value = true;
-    $q.notify({ message: 'Sign In Success.', color: 'green', position: 'top-right' });
+    $q.notify({
+      message: 'Sign In Success.',
+      color: 'green',
+      position: 'top-right',
+    });
   } else {
     visible.value = false;
     showSimulatedReturnData.value = true;
@@ -146,8 +185,6 @@ onMounted(async () => {
 const forgotPassword = () => {
   resetPwdDialog.value = true;
 };
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

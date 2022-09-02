@@ -1,6 +1,11 @@
 <template>
   <div>
-    <q-btn color="white" :to="{ name: 'create-item' }" text-color="black" label="Standard" />
+    <q-btn
+      color="white"
+      :to="{ name: 'create-item' }"
+      text-color="black"
+      label="Standard"
+    />
     <p>{{ title }}</p>
     <ul>
       <li v-for="todo in todos" :key="todo.id" @click="increment">
@@ -11,12 +16,17 @@
     <p>Active: {{ active ? 'yes' : 'no' }}</p>
     <p>Clicks on todos: {{ clickCount }}</p>
   </div>
+
   <template>
     <div class="q-pa-md" style="max-width: 300px">
-      <q-input filled v-model="date">
-        <template v-slot:prepend>
+      <q-input v-model="date" filled>
+        <template #prepend>
           <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+            <q-popup-proxy
+              cover
+              transition-show="scale"
+              transition-hide="scale"
+            >
               <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Close" color="primary" flat />
@@ -26,9 +36,13 @@
           </q-icon>
         </template>
 
-        <template v-slot:append>
+        <template #append>
           <q-icon name="access_time" class="cursor-pointer">
-            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+            <q-popup-proxy
+              cover
+              transition-show="scale"
+              transition-hide="scale"
+            >
               <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Close" color="primary" flat />
@@ -65,5 +79,4 @@ function increment() {
 }
 
 const todoCount = computed(() => props.todos.length);
-
 </script>

@@ -1,5 +1,3 @@
 <template>
-  <div>
-    List BOOK
-  </div>
+  <div>List BOOK</div>
 </template>

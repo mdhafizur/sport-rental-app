@@ -4,7 +4,10 @@ import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth';
 import {
-  getFirestore, CollectionReference, collection, DocumentData,
+  getFirestore,
+  CollectionReference,
+  collection,
+  DocumentData,
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { Item } from './types/item.type';
@@ -32,7 +35,8 @@ export const firestore = getFirestore(App);
 export const storage = getStorage(App);
 
 // This is just a helper to add the type to the db responses
-const createCollection = <T = DocumentData>(collectionName: string) => collection(firestore, collectionName) as CollectionReference<T>;
+const createCollection = <T = DocumentData>(collectionName: string) =>
+  collection(firestore, collectionName) as CollectionReference<T>;
 
 export const usersCol = createCollection<any>('users');
 export const itemsCol = createCollection<Item>('items');

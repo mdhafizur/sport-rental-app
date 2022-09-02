@@ -7,9 +7,10 @@ import { firestore } from 'src/firebase';
 
 export const useItemsStore = defineStore({
   id: 'items',
-  state: () => ({
-    items: [],
-  } as IItemState),
+  state: () =>
+    ({
+      items: [],
+    } as IItemState),
   getters: {
     getItems: (state: IItemState) => state.items,
   },
@@ -19,7 +20,7 @@ export const useItemsStore = defineStore({
     },
     async fetchItems() {
       const querySnapshot = await getDocs(collection(firestore, 'items'));
-      this.items = querySnapshot.docs.map((item:any) => ({
+      this.items = querySnapshot.docs.map((item: any) => ({
         ...item.data(),
         id: item.id,
       }));
